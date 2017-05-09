@@ -1,6 +1,6 @@
 {
   "appid": "75c531f3-5839-4c8f-8ea3-036744f79a82",
-  "description": "Implementation of the McAfee ePO. Allows actions like <b>add tag</b>, <b>remove tag</b>, and <b>get device info</b>",
+  "description": "This app implements various endpoint based <b>investigative</b> and <b>containment</b> actions by integrating with <b>McAfee ePO</b>.",
   "name": "McAfee ePO",
   "publisher": "Phantom",
   "type": "endpoint",
@@ -13,7 +13,7 @@
   "logo": "mfeepo.png",
   "product_version_regex": ".*",
   "min_phantom_version": "1.2.256",
-  "license": "Copyright (c) Phantom Cyber Corporation 2016",
+  "license": "Copyright (c) Phantom Cyber Corporation 2016-2017",
   "configuration": {
     "username": {
       "data_type": "string",
