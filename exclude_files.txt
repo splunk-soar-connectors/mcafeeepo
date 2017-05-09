@@ -1,2 +1,3 @@
 mfeepo_connector.py
 mfeepo_consts.py
+.git*
