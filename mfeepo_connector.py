@@ -62,7 +62,7 @@ class EpoConnector(BaseConnector):
 
         if not conf.get(phantom.APP_JSON_VERIFY):
             # The mcafee.py file does a request using just URL lib
-            # This will generate SSL warnings when connecting to an insecure warning
+            # This will generate SSL warnings when connecting to an unverified server
             # This monkeypatch will solve that problem
             ssl._create_default_https_context = ssl._create_unverified_context
 
