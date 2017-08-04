@@ -25,6 +25,7 @@ import simplejson as json
 
 import threading
 import time
+import ssl
 
 # McAfee import
 import os
@@ -58,6 +59,13 @@ class EpoConnector(BaseConnector):
         port = conf[EPO_JSON_PORT]
         username = conf[EPO_JSON_USERNAME]
         password = conf[EPO_JSON_PASSWORD]
+
+        if not conf.get(phantom.APP_JSON_VERIFY):
+            # The mcafee.py file does a request using just URL lib
+            # I think some change has happened in python or something where it is stricter with ssl and https calls now
+            # This monkeypatch will solve it
+            ssl._create_default_https_context = ssl._create_unverified_context
+
         self.save_progress("Attempting to connect to ePO")
         try:
             self._mc_client = mcafee.client(host, port, username, password)
