@@ -43,6 +43,12 @@
       "data_type": "string",
       "order": 4,
       "description": "Quarantine tag"
+    },
+    "verify_server_cert": {
+      "data_type": "boolean",
+      "order": 5,
+      "description": "Verify Server Certificate",
+      "default": false
     }
   },
   "actions": [
