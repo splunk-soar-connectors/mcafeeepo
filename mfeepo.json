@@ -227,7 +227,8 @@
           "data_type": "string",
           "order": 0,
           "contains": [ "ip", "host name" ],
-          "required": true
+          "required": true,
+          "primary": true
         }
       },
       "render": {
