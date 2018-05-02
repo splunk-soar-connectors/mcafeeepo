@@ -1,3 +1,4 @@
 [submodule "mcafee"]
-	path = mcafee
-	url = ssh://git@prod-bb-1.phantom.local:7999/PER/mcafee.git
+    path = mcafee
+    url = ssh://git@bitbucket.phantom.us:7999/per/mcafee.git
+    ignore = dirty
