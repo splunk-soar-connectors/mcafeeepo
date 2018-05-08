@@ -6,7 +6,7 @@
     "type": "endpoint",
     "main_module": "mfeepo_connector.pyc",
     "app_version": "1.0.19",
-    "utctime_updated": "2018-05-07T22:43:45.000000Z",
+    "utctime_updated": "2018-05-08T01:49:52.000000Z",
     "package_name": "phantom_mcafeeepo",
     "product_vendor": "McAfee",
     "product_name": "McAfee ePO",
