@@ -1,6 +1,6 @@
 {
     "appid": "75c531f3-5839-4c8f-8ea3-036744f79a82",
-    "description": "This app implements various endpoint based investigative and containment actions by integrating with McAfee ePO.",
+    "description": "This app implements various endpoint based investigative and containment actions by integrating with McAfee ePO",
     "name": "McAfee ePO",
     "publisher": "Phantom",
     "type": "endpoint",
