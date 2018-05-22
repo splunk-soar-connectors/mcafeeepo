@@ -13,7 +13,7 @@
     "logo": "logo_mcafee_epo.svg",
     "logo_dark": "logo_mcafee_epo_dark.svg",
     "product_version_regex": ".*",
-    "min_phantom_version": "1.2.256",
+    "min_phantom_version": "3.5.180",
     "license": "Copyright (c) 2016-2018 Splunk Inc.",
     "configuration": {
         "username": {
