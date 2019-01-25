@@ -1,3 +1,5 @@
-mfeepo_connector.py
+docker-compose.yml
 mfeepo_consts.py
+mfeepo_connector.py
+Makefile
 .git*
