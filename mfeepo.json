@@ -66,7 +66,7 @@
         {
             "action": "add tag",
             "description": "Add a tag to an endpoint",
-            "type": "correct",
+            "type": "generic",
             "identifier": "add_tag",
             "undo": "remove tag",
             "read_only": false,
@@ -175,7 +175,7 @@
         {
             "action": "remove tag",
             "description": "Remove a tag from the endpoint",
-            "type": "contain",
+            "type": "generic",
             "identifier": "remove_tag",
             "undo": "add tag",
             "read_only": false,
