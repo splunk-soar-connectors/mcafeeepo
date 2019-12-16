@@ -118,8 +118,8 @@
                     "data_path": "action_result.parameter.ip_hostname",
                     "data_type": "string",
                     "contains": [
-                        "host name",
-                        "ip"
+                        "ip",
+                        "host name"
                     ],
                     "column_name": "Endpoint",
                     "column_order": 1
@@ -226,8 +226,8 @@
                     "data_path": "action_result.parameter.ip_hostname",
                     "data_type": "string",
                     "contains": [
-                        "host name",
-                        "ip"
+                        "ip",
+                        "host name"
                     ],
                     "column_name": "Endpoint",
                     "column_order": 1
@@ -319,8 +319,8 @@
                     "data_path": "action_result.parameter.ip_hostname",
                     "data_type": "string",
                     "contains": [
-                        "host name",
-                        "ip"
+                        "ip",
+                        "host name"
                     ],
                     "column_name": "Host",
                     "column_order": 2
@@ -621,8 +621,8 @@
                     "data_path": "action_result.parameter.ip_hostname",
                     "data_type": "string",
                     "contains": [
-                        "host name",
-                        "ip"
+                        "ip",
+                        "host name"
                     ],
                     "column_name": "Endpoint",
                     "column_order": 1
@@ -711,8 +711,8 @@
                     "data_path": "action_result.parameter.ip_hostname",
                     "data_type": "string",
                     "contains": [
-                        "host name",
-                        "ip"
+                        "ip",
+                        "host name"
                     ],
                     "column_name": "Endpoint",
                     "column_order": 1
