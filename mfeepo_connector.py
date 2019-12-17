@@ -1,9 +1,9 @@
 # --
 # File: mfeepo_connector.py
 #
-# Copyright © 2016-2018 Splunk Inc.
+# Copyright © 2016-2019 Splunk Inc.
 #
-# SPLUNK CONFIDENTIAL – Use or disclosure of this material in whole or in part
+# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
 # without a valid written license from Splunk Inc. is PROHIBITED.
 # --
 
@@ -18,6 +18,7 @@ from mfeepo_consts import *
 
 import simplejson as json
 
+from bs4 import UnicodeDammit
 import threading
 import time
 import ssl
@@ -50,8 +51,8 @@ class EpoConnector(BaseConnector):
         """ Try to establish connection with ePO
         """
         conf = self.get_config()
-        host = conf[EPO_JSON_HOST]
-        port = conf[EPO_JSON_PORT]
+        host = UnicodeDammit(conf[EPO_JSON_HOST]).unicode_markup.encode('utf-8')
+        port = UnicodeDammit(conf[EPO_JSON_PORT]).unicode_markup.encode('utf-8')
         username = conf[EPO_JSON_USERNAME]
         password = conf[EPO_JSON_PASSWORD]
 
@@ -65,9 +66,9 @@ class EpoConnector(BaseConnector):
         try:
             self._mc_client = mcafee.client(host, port, username, password)
         except Exception as e:
-            return self.set_status_save_progress(phantom.APP_ERROR, str(e))
+            return self.set_status(phantom.APP_ERROR, str(e))
 
-        return self.set_status_save_progress(phantom.APP_SUCCESS, "Created client")
+        return self.set_status(phantom.APP_SUCCESS, "Created client")
 
     def _check_tag(self, tags, tag):
         """ Check if tag is present in tags
@@ -97,9 +98,12 @@ class EpoConnector(BaseConnector):
         status_code = self._connect_to_epo()
 
         if (phantom.is_fail(status_code)):
-            return self.set_status_save_progress(phantom.APP_ERROR, "Unable to connect to ePO")
+            self.save_progress("Connectivity test failed")
+            return self.set_status(phantom.APP_ERROR, self.get_status_message())
 
-        return self.set_status_save_progress(phantom.APP_SUCCESS, "Connectivity test passed")
+        self.save_progress(self.get_status_message())
+        self.save_progress("Connectivity test passed")
+        return self.set_status(phantom.APP_SUCCESS)
 
     def _wakeup_agent(self, action_result, host):
 
@@ -160,6 +164,8 @@ class EpoConnector(BaseConnector):
 
         # Couldn't find tag
         self.set_status(phantom.APP_ERROR)
+        if tag:
+            tag = UnicodeDammit(tag).unicode_markup.encode('utf-8')
         action_result.set_status(phantom.APP_ERROR, "There is no tag: {}".format(tag))
         return action_result, None
 
@@ -186,7 +192,7 @@ class EpoConnector(BaseConnector):
             tag = self.get_config().get(EPO_JSON_QTAG, "")
             if (not tag):
                 self.set_status(phantom.APP_ERROR)
-                return action_result.set_status(phantom.APP_ERROR, "Need to set quarantine tag")
+                return action_result.set_status(phantom.APP_ERROR, "Please provide the quarantine tag in asset configuration parameter")
         else:
             tag = param[EPO_JSON_TAG]
 
@@ -260,7 +266,7 @@ class EpoConnector(BaseConnector):
             tag = self.get_config().get(EPO_JSON_QTAG, "")
             if (not tag):
                 self.set_status(phantom.APP_ERROR)
-                return action_result.set_status(phantom.APP_ERROR, "Need to set quarantine tag")
+                return action_result.set_status(phantom.APP_ERROR, "Please provide the quarantine tag in asset configuration parameter")
         else:
             tag = param[EPO_JSON_TAG]
 

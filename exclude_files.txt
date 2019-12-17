@@ -1,6 +1,5 @@
 docker-compose.yml
 Makefile
-mfeepo_consts.py
 .git*
 .gitlab-ci.yml
-mfeepo_connector.py
+*.py
