@@ -2,19 +2,19 @@
     "appid": "75c531f3-5839-4c8f-8ea3-036744f79a82",
     "description": "This app implements various endpoint based investigative and containment actions by integrating with McAfee ePO",
     "name": "McAfee ePO",
-    "publisher": "Phantom",
+    "publisher": "Splunk",
     "type": "endpoint",
     "main_module": "mfeepo_connector.pyc",
-    "app_version": "1.0.21",
-    "utctime_updated": "2018-05-22T20:24:12.000000Z",
+    "app_version": "1.0.27",
+    "utctime_updated": "2019-12-17T02:31:53.000000Z",
     "package_name": "phantom_mcafeeepo",
     "product_vendor": "McAfee",
     "product_name": "McAfee ePO",
     "logo": "logo_mcafee_epo.svg",
     "logo_dark": "logo_mcafee_epo_dark.svg",
     "product_version_regex": ".*",
-    "min_phantom_version": "3.5.180",
-    "license": "Copyright (c) 2016-2018 Splunk Inc.",
+    "min_phantom_version": "4.5.15922",
+    "license": "Copyright (c) 2016-2019 Splunk Inc.",
     "configuration": {
         "username": {
             "data_type": "string",
@@ -31,19 +31,19 @@
         "ip_hostname": {
             "data_type": "string",
             "order": 2,
-            "description": "Host of ePO instance",
+            "description": "Host of ePO Instance",
             "required": true
         },
         "port": {
             "data_type": "string",
             "order": 3,
-            "description": "Port number",
+            "description": "Port Number",
             "required": true
         },
         "quarantine_tag": {
             "data_type": "string",
             "order": 4,
-            "description": "Quarantine tag"
+            "description": "Quarantine Tag"
         },
         "verify_server_cert": {
             "data_type": "boolean",
@@ -79,14 +79,15 @@
                         "ip",
                         "host name"
                     ],
-                    "required": true
+                    "required": true,
+                    "primary": true
                 },
                 "tag": {
                     "description": "Tag to add",
                     "data_type": "string",
                     "order": 1,
                     "contains": [
-                        "mfeeop tag"
+                        "mfeepo tag"
                     ],
                     "required": true,
                     "primary": true
@@ -106,17 +107,19 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "Message",
-                    "column_order": 0
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.ip_hostname",
                     "data_type": "string",
                     "contains": [
-                        "host name",
-                        "ip"
+                        "ip",
+                        "host name"
                     ],
                     "column_name": "Endpoint",
                     "column_order": 1
@@ -131,20 +134,40 @@
                     "column_order": 2
                 },
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.parameter.wakeup_agent",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.wakeup_agent",
-                    "data_type": "boolean"
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 0
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
                 }
             ],
             "versions": "EQ(*)"
@@ -171,7 +194,7 @@
                     "description": "Tag to remove",
                     "data_type": "string",
                     "contains": [
-                        "mfeeop tag"
+                        "mfeepo tag"
                     ],
                     "order": 1,
                     "required": true,
@@ -192,17 +215,19 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "Message",
-                    "column_order": 0
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.ip_hostname",
                     "data_type": "string",
                     "contains": [
-                        "host name",
-                        "ip"
+                        "ip",
+                        "host name"
                     ],
                     "column_name": "Endpoint",
                     "column_order": 1
@@ -217,20 +242,40 @@
                     "column_order": 2
                 },
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.parameter.wakeup_agent",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.wakeup_agent",
-                    "data_type": "boolean"
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 0
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
                 }
             ],
             "versions": "EQ(*)"
@@ -263,6 +308,231 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "failed",
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip_hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ],
+                    "column_name": "Host",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.EPOBranchNode_AutoID",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_CPUSerialNum",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_CPUSpeed",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_CPUType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_ComputerName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_DefaultLangID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_Description",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_DomainName",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_FreeDiskSpace",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_FreeMemory",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_IPAddress",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_IPHostName",
+                    "data_type": "string",
+                    "contains": [
+                        "host name",
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_IPSubnet",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_IPSubnetMask",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_IPV4x",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_IPV6",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_IPXAddress",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_IsPortable",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_LastAgentHandler",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_NetAddress",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_NumOfCPU",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_OSBitMode",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_OSBuildNum",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_OSOEMID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_OSPlatform",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_OSServicePackVer",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_OSType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_OSVersion",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_ParentID",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_SubnetAddress",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_SubnetMask",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_SysvolFreeSpace",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_SysvolTotalSpace",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_TimeZone",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_TotalDiskSpace",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_TotalPhysicalMemory",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_UserName",
+                    "data_type": "string",
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_UserProperty1",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_UserProperty2",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_UserProperty3",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_UserProperty4",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOComputerProperties_Vdi",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOLeafNode_AgentGUID",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOLeafNode_AgentVersion",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOLeafNode_ExcludedTags",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOLeafNode_LastUpdate",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOLeafNode_ManagedState",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.EPOLeafNode_Tags.*.Tag",
+                    "data_type": "string",
+                    "contains": [
+                        "mfeepo tag"
+                    ],
+                    "column_name": "Tags",
+                    "column_order": 3
+                },
+                {
                     "data_path": "action_result.data.*.EPO_IP/Hostname",
                     "data_type": "string",
                     "contains": [
@@ -282,224 +552,7 @@
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.parameter.ip_hostname",
-                    "data_type": "string",
-                    "contains": [
-                        "host name",
-                        "ip"
-                    ],
-                    "column_name": "Host",
-                    "column_order": 2
-                },
-                {
-                    "data_path": "action_result.data.*.EPOLeafNode_Tags.*.Tag",
-                    "data_type": "string",
-                    "contains": [
-                        "mfeeop tag"
-                    ],
-                    "column_name": "Tags",
-                    "column_order": 3
-                },
-                {
-                    "data_path": "action_result.data.*.EPOBranchNode_AutoID",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOLeafNode_ExcludedTags",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOLeafNode_ManagedState",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOLeafNode_AgentVersion",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOLeafNode_LastUpdate",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOLeafNode_AgentGUID",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_Vdi",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_OSType",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_CPUType",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_OSOEMID",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_CPUSpeed",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_NumOfCPU",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_ParentID",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_TimeZone",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_UserName",
-                    "data_type": "string",
-                    "contains": [
-                        "user name"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_IPAddress",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_OSBitMode",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_OSVersion",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_DomainName",
-                    "data_type": "string",
-                    "contains": [
-                        "domain"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_FreeMemory",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_IPHostName",
-                    "data_type": "string",
-                    "contains": [
-                        "host name",
-                        "ip"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_IPXAddress",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_IsPortable",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_NetAddress",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_OSBuildNum",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_OSPlatform",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_SubnetMask",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_CPUSerialNum",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_ComputerName",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_DefaultLangID",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_FreeDiskSpace",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_SubnetAddress",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_TotalDiskSpace",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_SysvolFreeSpace",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_OSServicePackVer",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_SysvolTotalSpace",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_TotalPhysicalMemory",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_IPSubnetMask",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_IPSubnet",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_LastAgentHandler",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_UserProperty1",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_UserProperty2",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_UserProperty3",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_UserProperty4",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_IPV4x",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_IPV6",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_Description",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
@@ -508,11 +561,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
                 }
             ],
             "versions": "EQ(*)"
@@ -539,7 +598,7 @@
                 "wakeup_agent": {
                     "description": "Wakeup Agent after applying quarantine tag",
                     "data_type": "boolean",
-                    "order": 2,
+                    "order": 1,
                     "default": false
                 }
             },
@@ -551,35 +610,58 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "Message",
-                    "column_order": 0
+                    "example_values": [
+                        "failed",
+                        "success"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.ip_hostname",
                     "data_type": "string",
                     "contains": [
+                        "ip",
                         "host name"
                     ],
                     "column_name": "Endpoint",
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.parameter.wakeup_agent",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.wakeup_agent",
-                    "data_type": "boolean"
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 0
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
                 }
             ],
             "versions": "EQ(*)"
@@ -606,7 +688,7 @@
                 "wakeup_agent": {
                     "description": "Wakeup Agent after removing quarantine tag",
                     "data_type": "boolean",
-                    "order": 2,
+                    "order": 1,
                     "default": false
                 }
             },
@@ -618,36 +700,58 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip_hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ],
+                    "column_name": "Endpoint",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.wakeup_agent",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "column_name": "Message",
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.ip_hostname",
-                    "data_type": "string",
-                    "contains": [
-                        "host name",
-                        "ip"
-                    ],
-                    "column_name": "Endpoint",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.wakeup_agent",
-                    "data_type": "boolean"
-                },
-                {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
                 }
             ],
             "versions": "EQ(*)"
