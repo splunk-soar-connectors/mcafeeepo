@@ -480,6 +480,11 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data.*.EPOComputerProperties_SystemDescription",
+                    "data_type": "string",
+                    "example_value": "N/A"
+                },
+                {
                     "data_path": "action_result.data.*.EPOComputerProperties_SysvolFreeSpace",
                     "data_type": "numeric"
                 },
@@ -595,11 +600,6 @@
                     "example_values": [
                         0
                     ]
-                },
-                {
-                    "data_path": "action_result.data.*.EPOComputerProperties_SystemDescription",
-                    "data_type": "string",
-                    "example_value": "N/A" 
                 }
             ],
             "versions": "EQ(*)"
