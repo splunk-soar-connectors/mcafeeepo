@@ -57,7 +57,9 @@ class EpoConnector(BaseConnector):
             url = '{0}{1}'.format(self._url, endpoint)
             res = requests.get(url, auth=(self._username, self._password), params=params, verify=config.get(phantom.APP_JSON_VERIFY, False))
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), res
+            msg = "Error Connecting to server. Details: {0}".format(str(e))
+            self.debug_print(msg)
+            return action_result.set_status(phantom.APP_ERROR, msg), res
 
         if not(200 <= res.status_code < 399):
             msg = "The server {0}:{1} could not fulfill the request. Error code: {2}, Reason: {3}".format(self._host, self._port, res.status_code, res.reason)
@@ -68,7 +70,9 @@ class EpoConnector(BaseConnector):
             res = res.text
             res = json.loads(res[3:])
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Error while parsing the JSON. Error: {}".format(str(e))), res
+            msg = "Error while parsing the JSON. Error: {}".format(str(e))
+            self.debug_print(msg)
+            return action_result.set_status(phantom.APP_ERROR, msg), res
 
         return phantom.APP_SUCCESS, res
 
