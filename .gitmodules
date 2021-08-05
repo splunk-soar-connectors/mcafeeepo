@@ -1,4 +1,0 @@
-[submodule "mcafee"]
-    path = mcafee
-    url = git@cd.splunkdev.com:phantom-external/mcafee.git
-    ignore = dirty
