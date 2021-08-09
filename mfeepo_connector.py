@@ -1,7 +1,7 @@
 # --
 # File: mfeepo_connector.py
 #
-# Copyright © 2016-2019 Splunk Inc.
+# Copyright (c) 2016-2021 Splunk Inc.
 #
 # SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
 # without a valid written license from Splunk Inc. is PROHIBITED.
@@ -17,16 +17,9 @@ from phantom.action_result import ActionResult
 from mfeepo_consts import *
 
 import simplejson as json
-
-from bs4 import UnicodeDammit
 import threading
 import time
-import ssl
-
-# McAfee import
-import os
-os.sys.path.insert(0, '{}/mcafee'.format(os.path.dirname(os.path.abspath(__file__))))  # noqa
-import mcafee
+import requests
 
 
 class EpoConnector(BaseConnector):
@@ -39,7 +32,10 @@ class EpoConnector(BaseConnector):
 
     def __init__(self):
 
-        self._mc_client = None
+        self._username = None
+        self._password = None
+        self._host = None
+        self._port = None
 
         self._lock = threading.Lock()
         self._done = False  # Is it done waking up agent?
@@ -47,28 +43,38 @@ class EpoConnector(BaseConnector):
         super(EpoConnector, self).__init__()
         return
 
-    def _connect_to_epo(self):
-        """ Try to establish connection with ePO
-        """
-        conf = self.get_config()
-        host = UnicodeDammit(conf[EPO_JSON_HOST]).unicode_markup.encode('utf-8')
-        port = UnicodeDammit(conf[EPO_JSON_PORT]).unicode_markup.encode('utf-8')
-        username = conf[EPO_JSON_USERNAME]
-        password = conf[EPO_JSON_PASSWORD]
+    def _make_rest_call(self, endpoint, params, action_result):
 
-        if not conf.get(phantom.APP_JSON_VERIFY):
-            # The mcafee.py file does a request using just URL lib
-            # This will generate SSL warnings when connecting to an unverified server
-            # This monkeypatch will solve that problem
-            ssl._create_default_https_context = ssl._create_unverified_context
+        config = self.get_config()
 
-        self.save_progress("Attempting to connect to ePO")
+        res = {}
+
+        if params:
+            params.update({":output": "json"})
+
+        # Make a REST call
         try:
-            self._mc_client = mcafee.client(host, port, username, password)
+            url = '{0}{1}'.format(self._url, endpoint)
+            res = requests.get(url, auth=(self._username, self._password), params=params, verify=config.get(phantom.APP_JSON_VERIFY, False))
         except Exception as e:
-            return self.set_status(phantom.APP_ERROR, str(e))
+            msg = "Error Connecting to server. Details: {0}".format(str(e))
+            self.debug_print(msg)
+            return action_result.set_status(phantom.APP_ERROR, msg), res
 
-        return self.set_status(phantom.APP_SUCCESS, "Created client")
+        if not(200 <= res.status_code < 399):
+            msg = "The server {0}:{1} could not fulfill the request. Error code: {2}, Reason: {3}".format(self._host, self._port, res.status_code, res.reason)
+            return action_result.set_status(phantom.APP_ERROR, msg), res
+
+        # Parse the response
+        try:
+            res = res.text
+            res = json.loads(res[3:])
+        except Exception as e:
+            msg = "Error while parsing the JSON. Error: {}".format(str(e))
+            self.debug_print(msg)
+            return action_result.set_status(phantom.APP_ERROR, msg), res
+
+        return phantom.APP_SUCCESS, res
 
     def _check_tag(self, tags, tag):
         """ Check if tag is present in tags
@@ -91,13 +97,17 @@ class EpoConnector(BaseConnector):
             x[KEY_ETAGS] = [{"Tag": v.strip()} for v in x[KEY_ETAGS].split(',')]
         except:  # Something went wrong. Probably the wrong dictionary
             pass
-        return dict((k.replace('.', '_'), v) for k, v in x.iteritems())
+        return dict((k.replace('.', '_'), v) for k, v in x.items())
 
     def _test_connectivity(self, param):
 
-        status_code = self._connect_to_epo()
+        action_result = self.add_action_result(ActionResult(dict(param)))
 
-        if (phantom.is_fail(status_code)):
+        self.save_progress("Attempting to connect to ePO")
+
+        ret_val, _ = self._make_rest_call('system.find', {'param1': self._host}, action_result)
+
+        if phantom.is_fail(ret_val):
             self.save_progress("Connectivity test failed")
             return self.set_status(phantom.APP_ERROR, self.get_status_message())
 
@@ -111,14 +121,15 @@ class EpoConnector(BaseConnector):
         thread = threading.Thread(target=self._wait_for_wakeup)
         thread.start()
         try:
-            ret_val = self._mc_client.system.wakeupAgent(host)
+            _, res = self._make_rest_call('system.wakeupAgent', {'param1': host}, action_result)
         except Exception as e:
             self._join_thread(thread)
             self.set_status(phantom.APP_ERROR)
             return action_result.set_status(phantom.APP_ERROR, str(e))
 
         self._join_thread(thread)
-        if (ret_val == 0):
+        self.debug_print("Response after attempting to wake up agent: {}".format(res))
+        if res == 0:
             self.set_status(phantom.APP_ERROR)
             return action_result.set_status(phantom.APP_ERROR, "Failed to wakeup agent")
         else:
@@ -137,7 +148,7 @@ class EpoConnector(BaseConnector):
         i = 0
         while True:
             self._lock.acquire()
-            if (self._done):
+            if self._done:
                 self._lock.release()
                 break
             self.send_progress("Attempting to wake up agent" + "." * i)
@@ -151,21 +162,23 @@ class EpoConnector(BaseConnector):
           " Also, fix the case of the tag
         """
         try:
-            tag_dicts = self._mc_client.system.findTag(tag)
+
+            ret_val, tag_dicts = self._make_rest_call('system.findTag', {'param1': tag}, action_result)
         except Exception as e:
             self.set_status(phantom.APP_ERROR)
             action_result.set_status(phantom.APP_ERROR, str(e))
             return action_result, None
 
+        if phantom.is_fail(ret_val):
+            return action_result, tag
+
         for tag_dict in tag_dicts:
-            if (tag_dict['tagName'].lower() == tag.lower()):
+            if tag_dict['tagName'].lower() == tag.lower():
                 action_result.set_status(phantom.APP_SUCCESS)
                 return action_result, tag_dict['tagName']
 
         # Couldn't find tag
         self.set_status(phantom.APP_ERROR)
-        if tag:
-            tag = UnicodeDammit(tag).unicode_markup.encode('utf-8')
         action_result.set_status(phantom.APP_ERROR, "There is no tag: {}".format(tag))
         return action_result, None
 
@@ -181,16 +194,11 @@ class EpoConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        status_code = self._connect_to_epo()
-
-        if (phantom.is_fail(status_code)):
-            return action_result.set_status(phantom.APP_ERROR, self.get_status_message())
-
         host = param[EPO_JSON_HOST]  # Endpoint to add tag to
         wakeup_agent = param.get(EPO_JSON_WAKEUP_AGENT, False)
-        if (quarantine):
+        if quarantine:
             tag = self.get_config().get(EPO_JSON_QTAG, "")
-            if (not tag):
+            if not tag:
                 self.set_status(phantom.APP_ERROR)
                 return action_result.set_status(phantom.APP_ERROR, "Please provide the quarantine tag in asset configuration parameter")
         else:
@@ -199,27 +207,27 @@ class EpoConnector(BaseConnector):
         action_result, tag = self._validate_tag(action_result, host, tag)
 
         # Tag doesn't exist
-        if (phantom.is_fail(action_result.get_status())):
+        if phantom.is_fail(action_result.get_status()):
             return action_result.get_status()
 
         action_result, r_dict = self._find(action_result, host)
 
         # Host doesn't exist
-        if (phantom.is_fail(action_result.get_status())):
+        if phantom.is_fail(action_result.get_status()):
             return action_result.get_status()
 
         # Endpoint already has tag
-        if (self._check_tag(r_dict[KEY_TAGS], tag)):
+        if self._check_tag(r_dict[KEY_TAGS], tag):
             return action_result.set_status(phantom.APP_SUCCESS, "Success, tag already added")
 
         action_result = self._apply_tag(action_result, host, tag)
 
-        if (not wakeup_agent or phantom.is_fail(action_result.get_status())):
+        if not wakeup_agent or phantom.is_fail(action_result.get_status()):
             return action_result.get_status()
 
         ret_val = self._wakeup_agent(action_result, host)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.set_status(phantom.APP_ERROR,
                     "Assigned tag but host did not recieve configuration")
 
@@ -229,13 +237,14 @@ class EpoConnector(BaseConnector):
     def _apply_tag(self, action_result, host, tag):
 
         try:
-            ret_val = self._mc_client.system.applyTag(host, tag)
+            ret_val, _ = self._make_rest_call('system.applyTag', {'param1': host, 'param2': tag}, action_result)
+
         except:  # Something went wrong
             self.set_status(phantom.APP_ERROR)
             action_result.set_status(phantom.APP_ERROR, "Failed to assign tag")
             return action_result
 
-        if (ret_val == 0):  # Something else went wrong
+        if ret_val == 0:  # Something else went wrong
             self.set_status(phantom.APP_ERROR)
             action_result.set_status(phantom.APP_SUCCESS, "Failed to assign tag")
         else:
@@ -255,16 +264,11 @@ class EpoConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        status_code = self._connect_to_epo()
-
-        if (phantom.is_fail(status_code)):
-            return action_result.set_status(phantom.APP_ERROR, self.get_status_message())
-
         host = param[EPO_JSON_HOST]  # Endpoint to remove tag from
         wakeup_agent = param.get(EPO_JSON_WAKEUP_AGENT, False)
-        if (quarantine):
+        if quarantine:
             tag = self.get_config().get(EPO_JSON_QTAG, "")
-            if (not tag):
+            if not tag:
                 self.set_status(phantom.APP_ERROR)
                 return action_result.set_status(phantom.APP_ERROR, "Please provide the quarantine tag in asset configuration parameter")
         else:
@@ -273,27 +277,27 @@ class EpoConnector(BaseConnector):
         action_result, tag = self._validate_tag(action_result, host, tag)
 
         # Tag doesn't exist
-        if (phantom.is_fail(action_result.get_status())):
+        if phantom.is_fail(action_result.get_status()):
             return action_result.get_status()
 
         action_result, r_dict = self._find(action_result, host)
 
         # Host doesn't exist
-        if (phantom.is_fail(action_result.get_status())):
+        if phantom.is_fail(action_result.get_status()):
             return action_result.get_status()
 
         # Endpoint already has tag
-        if (not self._check_tag(r_dict[KEY_TAGS], tag)):
+        if not self._check_tag(r_dict[KEY_TAGS], tag):
             return action_result.set_status(phantom.APP_SUCCESS, "Success, tag not present")
 
         action_result = self._clear_tag(action_result, host, tag)
 
-        if (not wakeup_agent or phantom.is_fail(action_result.get_status())):
+        if not wakeup_agent or phantom.is_fail(action_result.get_status()):
             return action_result.get_status()
 
         ret_val = self._wakeup_agent(action_result, host)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.set_status(phantom.APP_ERROR,
                     "Removed tag but host did not recieve configuration")
 
@@ -303,13 +307,13 @@ class EpoConnector(BaseConnector):
     def _clear_tag(self, action_result, host, tag):
 
         try:
-            ret_val = self._mc_client.system.clearTag(host, tag)
+            _, resp = self._make_rest_call('system.clearTag', {'param1': host, 'param2': tag}, action_result)
         except:
             self.set_status(phantom.APP_ERROR)
             action_result.set_status(phantom.APP_ERROR, "Failed to remove tag")
             return action_result
 
-        if (ret_val == 0):
+        if resp == 0:
             self.set_status(phantom.APP_ERROR)
             action_result.set_status(phantom.APP_ERROR, "Failed to remove tag")
         else:
@@ -318,19 +322,13 @@ class EpoConnector(BaseConnector):
         return action_result
 
     def _get_device_info(self, param):
-
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        status_code = self._connect_to_epo()
-
-        if (phantom.is_fail(status_code)):
-            return action_result.set_status(phantom.APP_ERROR, self.get_status_message())
 
         host = param[EPO_JSON_HOST]  # Endpoint to get info from
 
         action_result, r_dict = self._find(action_result, host)
 
-        if (phantom.is_fail(action_result.get_status())):
+        if phantom.is_fail(action_result.get_status()):
             return action_result.get_status()
 
         config = self.get_config()
@@ -346,14 +344,17 @@ class EpoConnector(BaseConnector):
         """
         try:
             # result is a list of matching hosts
-            result = self._mc_client.system.find(host)
+            ret_val, result = self._make_rest_call('system.find', {'param1': host}, action_result)
         except Exception as e:
             self.set_status(phantom.APP_ERROR)
             action_result.set_status(phantom.APP_ERROR, str(e))
             return action_result, None
 
+        if phantom.is_fail(ret_val):
+            return action_result, None
+
         for r in result:
-            if (r[IP_ADDR] == host or r[NAME].lower() == host.lower()):
+            if r[IP_ADDR] == host or r[NAME].lower() == host.lower():
                 action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved device info")
                 return action_result, r
 
@@ -366,20 +367,32 @@ class EpoConnector(BaseConnector):
         action = self.get_action_identifier()
         ret_val = phantom.APP_SUCCESS
 
-        if (action == phantom.ACTION_ID_TEST_ASSET_CONNECTIVITY):
+        if action == phantom.ACTION_ID_TEST_ASSET_CONNECTIVITY:
             ret_val = self._test_connectivity(param)
-        elif (action == self.ACTION_ID_ADD_TAG):
+        elif action == self.ACTION_ID_ADD_TAG:
             ret_val = self._add_tag(param)
-        elif (action == self.ACTION_ID_REMOVE_TAG):
+        elif action == self.ACTION_ID_REMOVE_TAG:
             ret_val = self._remove_tag(param)
-        elif (action == self.ACTION_ID_GET_DEVICE_INFO):
+        elif action == self.ACTION_ID_GET_DEVICE_INFO:
             ret_val = self._get_device_info(param)
-        elif (action == self.ACTION_ID_QUARANTINE_DEVICE):
+        elif action == self.ACTION_ID_QUARANTINE_DEVICE:
             ret_val = self._quarantine_device(param)
-        elif (action == self.ACTION_ID_UNQUARANTINE_DEVICE):
+        elif action == self.ACTION_ID_UNQUARANTINE_DEVICE:
             ret_val = self._unquarantine_device(param)
 
         return ret_val
+
+    def initialize(self):
+        # get the asset config
+        config = self.get_config()
+
+        self._host = config[EPO_JSON_HOST]
+        self._port = config[EPO_JSON_PORT]
+        self._url = 'https://{0}:{1}/remote/'.format(self._host, self._port)
+        self._username = config[EPO_JSON_USERNAME]
+        self._password = config[EPO_JSON_PASSWORD]
+
+        return phantom.APP_SUCCESS
 
 
 if __name__ == '__main__':
@@ -408,6 +421,6 @@ if __name__ == '__main__':
         ret_val = connector._handle_action(json.dumps(in_json), None)
 
         # Dump the return value
-        print ret_val
+        print(ret_val)
 
     exit(0)
