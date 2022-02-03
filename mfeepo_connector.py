@@ -15,18 +15,17 @@
 #
 #
 # Phatom imports
-import phantom.app as phantom
-from phantom.base_connector import BaseConnector
-from phantom.action_result import ActionResult
+import threading
+import time
 
+import phantom.app as phantom
+import requests
+import simplejson as json
+from phantom.action_result import ActionResult
+from phantom.base_connector import BaseConnector
 
 # Local imports
 from mfeepo_consts import *
-
-import simplejson as json
-import threading
-import time
-import requests
 
 
 class EpoConnector(BaseConnector):
@@ -62,14 +61,21 @@ class EpoConnector(BaseConnector):
         # Make a REST call
         try:
             url = '{0}{1}'.format(self._url, endpoint)
-            res = requests.get(url, auth=(self._username, self._password), params=params, verify=config.get(phantom.APP_JSON_VERIFY, False))
+            res = requests.get(url,
+                               auth=(self._username, self._password),
+                               params=params,
+                               verify=config.get(phantom.APP_JSON_VERIFY, False),
+                               timeout=DEFAULT_TIMEOUT)
         except Exception as e:
             msg = "Error Connecting to server. Details: {0}".format(str(e))
             self.debug_print(msg)
             return action_result.set_status(phantom.APP_ERROR, msg), res
 
         if not(200 <= res.status_code < 399):
-            msg = "The server {0}:{1} could not fulfill the request. Error code: {2}, Reason: {3}".format(self._host, self._port, res.status_code, res.reason)
+            msg = "The server {0}:{1} could not fulfill the request. Error code: {2}, Reason: {3}".format(self._host,
+                                                                                                          self._port,
+                                                                                                          res.status_code,
+                                                                                                          res.reason)
             return action_result.set_status(phantom.APP_ERROR, msg), res
 
         # Parse the response
@@ -405,6 +411,7 @@ class EpoConnector(BaseConnector):
 if __name__ == '__main__':
     # Imports
     import sys
+
     import pudb
 
     # Breakpoint at runtime
@@ -430,4 +437,4 @@ if __name__ == '__main__':
         # Dump the return value
         print(ret_val)
 
-    exit(0)
+    sys.exit(0)
