@@ -12,8 +12,10 @@
 # the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
+DEFAULT_TIMEOUT = 30
+
 EPO_JSON_USERNAME = "username"
-EPO_JSON_PASSWORD = "password"
+EPO_JSON_PASSWORD = "password"  # pragma: allowlist secret
 EPO_JSON_HOST = "ip_hostname"
 EPO_JSON_PORT = "port"
 EPO_JSON_QTAG = "quarantine_tag"
