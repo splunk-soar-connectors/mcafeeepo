@@ -19,7 +19,7 @@
     ],
     "python_version": "3",
     "license": "Copyright (c) 2016-2022 Splunk Inc.",
-    "fips_compliant": true,
+    "fips_compliant": false,
     "configuration": {
         "username": {
             "data_type": "string",
