@@ -1,25 +1,31 @@
-# --
 # File: mfeepo_connector.py
 #
-# Copyright (c) 2016-2021 Splunk Inc.
+# Copyright (c) 2016-2022 Splunk Inc.
 #
-# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
-# without a valid written license from Splunk Inc. is PROHIBITED.
-# --
-
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software distributed under
+# the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+# either express or implied. See the License for the specific language governing permissions
+# and limitations under the License.
+#
+#
 # Phatom imports
-import phantom.app as phantom
-from phantom.base_connector import BaseConnector
-from phantom.action_result import ActionResult
+import threading
+import time
 
+import phantom.app as phantom
+import requests
+import simplejson as json
+from phantom.action_result import ActionResult
+from phantom.base_connector import BaseConnector
 
 # Local imports
 from mfeepo_consts import *
-
-import simplejson as json
-import threading
-import time
-import requests
 
 
 class EpoConnector(BaseConnector):
@@ -55,14 +61,21 @@ class EpoConnector(BaseConnector):
         # Make a REST call
         try:
             url = '{0}{1}'.format(self._url, endpoint)
-            res = requests.get(url, auth=(self._username, self._password), params=params, verify=config.get(phantom.APP_JSON_VERIFY, False))
+            res = requests.get(url,
+                               auth=(self._username, self._password),
+                               params=params,
+                               verify=config.get(phantom.APP_JSON_VERIFY, False),
+                               timeout=DEFAULT_TIMEOUT)
         except Exception as e:
             msg = "Error Connecting to server. Details: {0}".format(str(e))
             self.debug_print(msg)
             return action_result.set_status(phantom.APP_ERROR, msg), res
 
         if not(200 <= res.status_code < 399):
-            msg = "The server {0}:{1} could not fulfill the request. Error code: {2}, Reason: {3}".format(self._host, self._port, res.status_code, res.reason)
+            msg = "The server {0}:{1} could not fulfill the request. Error code: {2}, Reason: {3}".format(self._host,
+                                                                                                          self._port,
+                                                                                                          res.status_code,
+                                                                                                          res.reason)
             return action_result.set_status(phantom.APP_ERROR, msg), res
 
         # Parse the response
@@ -398,6 +411,7 @@ class EpoConnector(BaseConnector):
 if __name__ == '__main__':
     # Imports
     import sys
+
     import pudb
 
     # Breakpoint at runtime
@@ -423,4 +437,4 @@ if __name__ == '__main__':
         # Dump the return value
         print(ret_val)
 
-    exit(0)
+    sys.exit(0)
