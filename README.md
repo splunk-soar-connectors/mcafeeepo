@@ -2,7 +2,7 @@
 # McAfee ePO
 
 Publisher: Splunk  
-Connector Version: 2\.0\.4  
+Connector Version: 2\.0\.5  
 Product Vendor: McAfee  
 Product Name: McAfee ePO  
 Product Version Supported (regex): "\.\*"  
