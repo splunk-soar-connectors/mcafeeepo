@@ -13,7 +13,7 @@
     "logo": "logo_mcafee_epo.svg",
     "logo_dark": "logo_mcafee_epo_dark.svg",
     "product_version_regex": ".*",
-    "min_phantom_version": "5.1.0",
+    "min_phantom_version": "5.2.0",
     "latest_tested_versions": [
         "McAfee ePO v5.3.2"
     ],
