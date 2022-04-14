@@ -5,21 +5,21 @@
     "publisher": "Splunk",
     "type": "endpoint",
     "main_module": "mfeepo_connector.py",
-    "app_version": "2.0.4",
-    "utctime_updated": "2022-02-15T02:25:50.000000Z",
+    "app_version": "2.0.5",
+    "utctime_updated": "2022-03-01T21:27:34.000000Z",
     "package_name": "phantom_mcafeeepo",
     "product_vendor": "McAfee",
     "product_name": "McAfee ePO",
     "logo": "logo_mcafee_epo.svg",
     "logo_dark": "logo_mcafee_epo_dark.svg",
     "product_version_regex": ".*",
-    "min_phantom_version": "5.1.0",
+    "min_phantom_version": "5.2.0",
     "latest_tested_versions": [
         "McAfee ePO v5.3.2"
     ],
     "python_version": "3",
     "license": "Copyright (c) 2016-2022 Splunk Inc.",
-    "fips_compliant": false,
+    "fips_compliant": true,
     "configuration": {
         "username": {
             "data_type": "string",
