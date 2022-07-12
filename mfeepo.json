@@ -5,7 +5,7 @@
     "publisher": "Splunk",
     "type": "endpoint",
     "main_module": "mfeepo_connector.py",
-    "app_version": "2.0.5",
+    "app_version": "2.0.6",
     "utctime_updated": "2022-03-01T21:27:34.000000Z",
     "package_name": "phantom_mcafeeepo",
     "product_vendor": "McAfee",
