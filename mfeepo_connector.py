@@ -49,6 +49,34 @@ class EpoConnector(BaseConnector):
         super(EpoConnector, self).__init__()
         return
 
+    # Check the _get_error_message_from_exception() method
+    def _get_error_message_from_exception(self, e):
+        '''
+        Get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        '''
+        error_code = None
+        error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            if hasattr(e, "args"):
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_msg = e.args[0]
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            self.debug_print("Error occurred while fetching exception information. Details: {}".format(str(error_msg)))
+
+        if not error_code:
+            error_text = "Error Message: {}".format(error_msg)
+        else:
+            error_text = "Error Code: {}. Error Message: {}".format(error_code, error_msg)
+
+        return error_text
+
     def _make_rest_call(self, endpoint, params, action_result):
 
         config = self.get_config()
@@ -67,7 +95,8 @@ class EpoConnector(BaseConnector):
                                verify=config.get(phantom.APP_JSON_VERIFY, False),
                                timeout=DEFAULT_TIMEOUT)
         except Exception as e:
-            msg = "Error Connecting to server. Details: {0}".format(str(e))
+            error_msg = self._get_error_message_from_exception(e)
+            msg = "Error Connecting to server. Details: {0}".format(str(error_msg))
             self.debug_print(msg)
             return action_result.set_status(phantom.APP_ERROR, msg), res
 
@@ -108,7 +137,7 @@ class EpoConnector(BaseConnector):
         try:
             x[KEY_TAGS] = [{"Tag": v.strip()} for v in x[KEY_TAGS].split(',')]
             x[KEY_ETAGS] = [{"Tag": v.strip()} for v in x[KEY_ETAGS].split(',')]
-        except:  # Something went wrong. Probably the wrong dictionary
+        except Exception:  # Something went wrong. Probably the wrong dictionary
             pass
         return dict((k.replace('.', '_'), v) for k, v in x.items())
 
@@ -136,9 +165,10 @@ class EpoConnector(BaseConnector):
         try:
             _, res = self._make_rest_call('system.wakeupAgent', {'param1': host}, action_result)
         except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
             self._join_thread(thread)
             self.set_status(phantom.APP_ERROR)
-            return action_result.set_status(phantom.APP_ERROR, str(e))
+            return action_result.set_status(phantom.APP_ERROR, str(error_msg))
 
         self._join_thread(thread)
         self.debug_print("Response after attempting to wake up agent: {}".format(res))
@@ -178,8 +208,9 @@ class EpoConnector(BaseConnector):
 
             ret_val, tag_dicts = self._make_rest_call('system.findTag', {'param1': tag}, action_result)
         except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
             self.set_status(phantom.APP_ERROR)
-            action_result.set_status(phantom.APP_ERROR, str(e))
+            action_result.set_status(phantom.APP_ERROR, str(error_msg))
             return action_result, None
 
         if phantom.is_fail(ret_val):
@@ -242,17 +273,17 @@ class EpoConnector(BaseConnector):
 
         if phantom.is_fail(ret_val):
             return action_result.set_status(phantom.APP_ERROR,
-                    "Assigned tag but host did not recieve configuration")
+                                            "Assigned tag but host did not recieve configuration")
 
         return action_result.set_status(phantom.APP_SUCCESS,
-                "Assigned tag and host received configuration")
+                                        "Assigned tag and host received configuration")
 
     def _apply_tag(self, action_result, host, tag):
 
         try:
             ret_val, _ = self._make_rest_call('system.applyTag', {'param1': host, 'param2': tag}, action_result)
 
-        except:  # Something went wrong
+        except Exception:  # Something went wrong
             self.set_status(phantom.APP_ERROR)
             action_result.set_status(phantom.APP_ERROR, "Failed to assign tag")
             return action_result
@@ -312,16 +343,16 @@ class EpoConnector(BaseConnector):
 
         if phantom.is_fail(ret_val):
             return action_result.set_status(phantom.APP_ERROR,
-                    "Removed tag but host did not recieve configuration")
+                                            "Removed tag but host did not recieve configuration")
 
         return action_result.set_status(phantom.APP_SUCCESS,
-                "Removed tag and host received configuration")
+                                        "Removed tag and host received configuration")
 
     def _clear_tag(self, action_result, host, tag):
 
         try:
             _, resp = self._make_rest_call('system.clearTag', {'param1': host, 'param2': tag}, action_result)
-        except:
+        except Exception:
             self.set_status(phantom.APP_ERROR)
             action_result.set_status(phantom.APP_ERROR, "Failed to remove tag")
             return action_result
@@ -359,8 +390,9 @@ class EpoConnector(BaseConnector):
             # result is a list of matching hosts
             ret_val, result = self._make_rest_call('system.find', {'param1': host}, action_result)
         except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
             self.set_status(phantom.APP_ERROR)
-            action_result.set_status(phantom.APP_ERROR, str(e))
+            action_result.set_status(phantom.APP_ERROR, str(error_msg))
             return action_result, None
 
         if phantom.is_fail(ret_val):
