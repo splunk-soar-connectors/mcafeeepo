@@ -275,7 +275,7 @@ class EpoConnector(BaseConnector):
         except Exception:  # Something went wrong
             return action_result.set_status(phantom.APP_ERROR, "Failed to assign tag")
 
-        if ret_val == 0:  # Something else went wrong
+        if phantom.is_fail(ret_val):  # Something else went wrong
             return action_result.set_status(phantom.APP_SUCCESS, "Failed to assign tag")
         else:
             return action_result.set_status(phantom.APP_SUCCESS, "Successfully assigned tag")
