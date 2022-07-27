@@ -1,2 +1,2 @@
 **Unreleased**
-Added documentation for required permission to run actions[PAPP-26675]
+Documented the permissions required to execute the actions [PAPP-26675]
