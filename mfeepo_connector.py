@@ -67,8 +67,7 @@ class EpoConnector(BaseConnector):
                 elif len(e.args) == 1:
                     error_msg = e.args[0]
         except Exception as e:
-            error_msg = self._get_error_message_from_exception(e)
-            self.debug_print("Error occurred while fetching exception information. Details: {}".format(str(error_msg)))
+            self.debug_print("Error occurred while fetching exception information. Details: {}".format(str(e)))
 
         if not error_code:
             error_text = "Error Message: {}".format(error_msg)
@@ -151,11 +150,11 @@ class EpoConnector(BaseConnector):
 
         if phantom.is_fail(ret_val):
             self.save_progress("Connectivity test failed")
-            return self.set_status(phantom.APP_ERROR, self.get_status_message())
+            return action_result.set_status(phantom.APP_ERROR, self.get_status_message())
 
         self.save_progress(self.get_status_message())
         self.save_progress("Connectivity test passed")
-        return self.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _wakeup_agent(self, action_result, host):
 
@@ -167,13 +166,11 @@ class EpoConnector(BaseConnector):
         except Exception as e:
             error_msg = self._get_error_message_from_exception(e)
             self._join_thread(thread)
-            self.set_status(phantom.APP_ERROR)
             return action_result.set_status(phantom.APP_ERROR, str(error_msg))
 
         self._join_thread(thread)
         self.debug_print("Response after attempting to wake up agent: {}".format(res))
         if res == 0:
-            self.set_status(phantom.APP_ERROR)
             return action_result.set_status(phantom.APP_ERROR, "Failed to wakeup agent")
         else:
             return action_result.set_status(phantom.APP_SUCCESS, "Successfully woke up agent")
@@ -205,26 +202,19 @@ class EpoConnector(BaseConnector):
           " Also, fix the case of the tag
         """
         try:
-
             ret_val, tag_dicts = self._make_rest_call('system.findTag', {'param1': tag}, action_result)
         except Exception as e:
             error_msg = self._get_error_message_from_exception(e)
-            self.set_status(phantom.APP_ERROR)
-            action_result.set_status(phantom.APP_ERROR, str(error_msg))
-            return action_result, None
+            return action_result.set_status(phantom.APP_ERROR, str(error_msg)), None
 
         if phantom.is_fail(ret_val):
             return action_result, tag
 
         for tag_dict in tag_dicts:
             if tag_dict['tagName'].lower() == tag.lower():
-                action_result.set_status(phantom.APP_SUCCESS)
-                return action_result, tag_dict['tagName']
+                return action_result.set_status(phantom.APP_SUCCESS), tag_dict['tagName']
 
-        # Couldn't find tag
-        self.set_status(phantom.APP_ERROR)
-        action_result.set_status(phantom.APP_ERROR, "There is no tag: {}".format(tag))
-        return action_result, None
+        return action_result.set_status(phantom.APP_ERROR, "There is no tag: {}".format(tag)), None
 
     def _add_tag(self, param):
         """ Actual handler for add_tag action
@@ -243,30 +233,29 @@ class EpoConnector(BaseConnector):
         if quarantine:
             tag = self.get_config().get(EPO_JSON_QTAG, "")
             if not tag:
-                self.set_status(phantom.APP_ERROR)
                 return action_result.set_status(phantom.APP_ERROR, "Please provide the quarantine tag in asset configuration parameter")
         else:
             tag = param[EPO_JSON_TAG]
 
-        action_result, tag = self._validate_tag(action_result, host, tag)
+        ret_val, tag = self._validate_tag(action_result, host, tag)
 
         # Tag doesn't exist
-        if phantom.is_fail(action_result.get_status()):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        action_result, r_dict = self._find(action_result, host)
+        ret_val, r_dict = self._find(action_result, host)
 
         # Host doesn't exist
-        if phantom.is_fail(action_result.get_status()):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Endpoint already has tag
         if self._check_tag(r_dict[KEY_TAGS], tag):
             return action_result.set_status(phantom.APP_SUCCESS, "Success, tag already added")
 
-        action_result = self._apply_tag(action_result, host, tag)
+        ret_val = self._apply_tag(action_result, host, tag)
 
-        if not wakeup_agent or phantom.is_fail(action_result.get_status()):
+        if not wakeup_agent or phantom.is_fail(ret_val):
             return action_result.get_status()
 
         ret_val = self._wakeup_agent(action_result, host)
@@ -284,17 +273,12 @@ class EpoConnector(BaseConnector):
             ret_val, _ = self._make_rest_call('system.applyTag', {'param1': host, 'param2': tag}, action_result)
 
         except Exception:  # Something went wrong
-            self.set_status(phantom.APP_ERROR)
-            action_result.set_status(phantom.APP_ERROR, "Failed to assign tag")
-            return action_result
+            return action_result.set_status(phantom.APP_ERROR, "Failed to assign tag")
 
         if ret_val == 0:  # Something else went wrong
-            self.set_status(phantom.APP_ERROR)
-            action_result.set_status(phantom.APP_SUCCESS, "Failed to assign tag")
+            return action_result.set_status(phantom.APP_SUCCESS, "Failed to assign tag")
         else:
-            action_result.set_status(phantom.APP_SUCCESS, "Successfully assigned tag")
-
-        return action_result
+            return action_result.set_status(phantom.APP_SUCCESS, "Successfully assigned tag")
 
     def _remove_tag(self, param):
         """ actual handler for remove_tag action
@@ -313,30 +297,29 @@ class EpoConnector(BaseConnector):
         if quarantine:
             tag = self.get_config().get(EPO_JSON_QTAG, "")
             if not tag:
-                self.set_status(phantom.APP_ERROR)
                 return action_result.set_status(phantom.APP_ERROR, "Please provide the quarantine tag in asset configuration parameter")
         else:
             tag = param[EPO_JSON_TAG]
 
-        action_result, tag = self._validate_tag(action_result, host, tag)
+        ret_val, tag = self._validate_tag(action_result, host, tag)
 
         # Tag doesn't exist
-        if phantom.is_fail(action_result.get_status()):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        action_result, r_dict = self._find(action_result, host)
+        ret_val, r_dict = self._find(action_result, host)
 
         # Host doesn't exist
-        if phantom.is_fail(action_result.get_status()):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Endpoint already has tag
         if not self._check_tag(r_dict[KEY_TAGS], tag):
             return action_result.set_status(phantom.APP_SUCCESS, "Success, tag not present")
 
-        action_result = self._clear_tag(action_result, host, tag)
+        ret_val = self._clear_tag(action_result, host, tag)
 
-        if not wakeup_agent or phantom.is_fail(action_result.get_status()):
+        if not wakeup_agent or phantom.is_fail(ret_val):
             return action_result.get_status()
 
         ret_val = self._wakeup_agent(action_result, host)
@@ -353,26 +336,21 @@ class EpoConnector(BaseConnector):
         try:
             _, resp = self._make_rest_call('system.clearTag', {'param1': host, 'param2': tag}, action_result)
         except Exception:
-            self.set_status(phantom.APP_ERROR)
-            action_result.set_status(phantom.APP_ERROR, "Failed to remove tag")
-            return action_result
+            return action_result.set_status(phantom.APP_ERROR, "Failed to remove tag")
 
         if resp == 0:
-            self.set_status(phantom.APP_ERROR)
-            action_result.set_status(phantom.APP_ERROR, "Failed to remove tag")
+            return action_result.set_status(phantom.APP_ERROR, "Failed to remove tag")
         else:
-            action_result.set_status(phantom.APP_SUCCESS, "Successfully removed tag")
-
-        return action_result
+            return action_result.set_status(phantom.APP_SUCCESS, "Successfully removed tag")
 
     def _get_device_info(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         host = param[EPO_JSON_HOST]  # Endpoint to get info from
 
-        action_result, r_dict = self._find(action_result, host)
+        ret_val, r_dict = self._find(action_result, host)
 
-        if phantom.is_fail(action_result.get_status()):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         config = self.get_config()
@@ -391,21 +369,16 @@ class EpoConnector(BaseConnector):
             ret_val, result = self._make_rest_call('system.find', {'param1': host}, action_result)
         except Exception as e:
             error_msg = self._get_error_message_from_exception(e)
-            self.set_status(phantom.APP_ERROR)
-            action_result.set_status(phantom.APP_ERROR, str(error_msg))
-            return action_result, None
+            return action_result.set_status(phantom.APP_ERROR, str(error_msg)), None
 
         if phantom.is_fail(ret_val):
             return action_result, None
 
         for r in result:
             if r[IP_ADDR] == host or r[NAME].lower() == host.lower():
-                action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved device info")
-                return action_result, r
+                return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved device info"), r
 
-        self.set_status(phantom.APP_ERROR)
-        action_result.set_status(phantom.APP_ERROR, "Failed to locate host")
-        return action_result, None
+        return action_result.set_status(phantom.APP_ERROR, "Failed to locate host"), None
 
     def handle_action(self, param):
 
