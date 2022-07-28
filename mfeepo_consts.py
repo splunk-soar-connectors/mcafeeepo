@@ -26,3 +26,4 @@ KEY_TAGS = 'EPOLeafNode.Tags'
 KEY_ETAGS = 'EPOLeafNode.ExludedTags'
 IP_ADDR = 'EPOComputerProperties.IPAddress'
 NAME = 'EPOComputerProperties.ComputerName'
+ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"

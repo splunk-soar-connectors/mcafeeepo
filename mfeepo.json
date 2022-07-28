@@ -5,7 +5,7 @@
     "publisher": "Splunk",
     "type": "endpoint",
     "main_module": "mfeepo_connector.py",
-    "app_version": "2.0.5",
+    "app_version": "2.1.0",
     "utctime_updated": "2022-03-01T21:27:34.000000Z",
     "package_name": "phantom_mcafeeepo",
     "product_vendor": "McAfee",
@@ -790,7 +790,7 @@
         "wheel": [
             {
                 "module": "certifi",
-                "input_file": "wheels/shared/certifi-2021.10.8-py2.py3-none-any.whl"
+                "input_file": "wheels/py3/certifi-2022.6.15-py3-none-any.whl"
             },
             {
                 "module": "chardet",
@@ -810,7 +810,7 @@
             },
             {
                 "module": "urllib3",
-                "input_file": "wheels/shared/urllib3-1.26.8-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/urllib3-1.26.11-py2.py3-none-any.whl"
             }
         ]
     },
@@ -818,7 +818,7 @@
         "wheel": [
             {
                 "module": "certifi",
-                "input_file": "wheels/shared/certifi-2021.10.8-py2.py3-none-any.whl"
+                "input_file": "wheels/py3/certifi-2022.6.15-py3-none-any.whl"
             },
             {
                 "module": "chardet",
@@ -838,7 +838,7 @@
             },
             {
                 "module": "urllib3",
-                "input_file": "wheels/shared/urllib3-1.26.8-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/urllib3-1.26.11-py2.py3-none-any.whl"
             }
         ]
     }
