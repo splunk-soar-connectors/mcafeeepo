@@ -5,7 +5,7 @@
     "publisher": "Splunk",
     "type": "endpoint",
     "main_module": "mfeepo_connector.py",
-    "app_version": "2.1.0",
+    "app_version": "2.1.1",
     "utctime_updated": "2022-03-01T21:27:34.000000Z",
     "package_name": "phantom_mcafeeepo",
     "product_vendor": "McAfee",
@@ -13,7 +13,7 @@
     "logo": "logo_mcafee_epo.svg",
     "logo_dark": "logo_mcafee_epo_dark.svg",
     "product_version_regex": ".*",
-    "min_phantom_version": "5.2.0",
+    "min_phantom_version": "6.1.1",
     "latest_tested_versions": [
         "McAfee ePO v5.3.2"
     ],
