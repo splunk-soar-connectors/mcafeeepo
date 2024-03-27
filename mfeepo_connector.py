@@ -1,6 +1,6 @@
 # File: mfeepo_connector.py
 #
-# Copyright (c) 2016-2022 Splunk Inc.
+# Copyright (c) 2016-2024 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -56,22 +56,22 @@ class EpoConnector(BaseConnector):
         :return: error message
         '''
         error_code = None
-        error_msg = ERR_MSG_UNAVAILABLE
+        error_message = ERROR_MESSAGE_UNAVAILABLE
 
         try:
             if hasattr(e, "args"):
                 if len(e.args) > 1:
                     error_code = e.args[0]
-                    error_msg = e.args[1]
+                    error_message = e.args[1]
                 elif len(e.args) == 1:
-                    error_msg = e.args[0]
+                    error_message = e.args[0]
         except Exception as e:
             self.debug_print("Error occurred while fetching exception information. Details: {}".format(str(e)))
 
         if not error_code:
-            error_text = "Error Message: {}".format(error_msg)
+            error_text = "Error Message: {}".format(error_message)
         else:
-            error_text = "Error Code: {}. Error Message: {}".format(error_code, error_msg)
+            error_text = "Error Code: {}. Error Message: {}".format(error_code, error_message)
 
         return error_text
 
@@ -93,8 +93,8 @@ class EpoConnector(BaseConnector):
                                verify=config.get(phantom.APP_JSON_VERIFY, False),
                                timeout=DEFAULT_TIMEOUT)
         except Exception as e:
-            error_msg = self._get_error_message_from_exception(e)
-            msg = "Error Connecting to server. Details: {0}".format(error_msg)
+            error_message = self._get_error_message_from_exception(e)
+            msg = "Error Connecting to server. Details: {0}".format(error_message)
             self.debug_print(msg)
             return action_result.set_status(phantom.APP_ERROR, msg), res
 
@@ -162,9 +162,9 @@ class EpoConnector(BaseConnector):
         try:
             _, res = self._make_rest_call('system.wakeupAgent', {'param1': host}, action_result)
         except Exception as e:
-            error_msg = self._get_error_message_from_exception(e)
+            error_message = self._get_error_message_from_exception(e)
             self._join_thread(thread)
-            return action_result.set_status(phantom.APP_ERROR, error_msg)
+            return action_result.set_status(phantom.APP_ERROR, error_message)
 
         self._join_thread(thread)
         self.debug_print("Response after attempting to wake up agent: {}".format(res))
@@ -202,8 +202,8 @@ class EpoConnector(BaseConnector):
         try:
             ret_val, tag_dicts = self._make_rest_call('system.findTag', {'param1': tag}, action_result)
         except Exception as e:
-            error_msg = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, error_msg), None
+            error_message = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, error_message), None
 
         if phantom.is_fail(ret_val):
             return action_result.get_status(), tag
@@ -367,8 +367,8 @@ class EpoConnector(BaseConnector):
             # result is a list of matching hosts
             ret_val, result = self._make_rest_call('system.find', {'param1': host}, action_result)
         except Exception as e:
-            error_msg = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, error_msg), None
+            error_message = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, error_message), None
 
         if phantom.is_fail(ret_val):
             return action_result.get_status(), None
