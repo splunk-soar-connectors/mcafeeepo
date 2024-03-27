@@ -6,7 +6,7 @@ Connector Version: 2.1.1
 Product Vendor: McAfee  
 Product Name: McAfee ePO  
 Product Version Supported (regex): ".\*"  
-Minimum Product Version: 6.1.1  
+Minimum Product Version: 5.2.0  
 
 This app implements various endpoint based investigative and containment actions by integrating with McAfee ePO
 
