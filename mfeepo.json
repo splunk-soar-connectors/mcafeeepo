@@ -5,7 +5,7 @@
     "publisher": "Splunk",
     "type": "endpoint",
     "main_module": "mfeepo_connector.py",
-    "app_version": "2.1.0",
+    "app_version": "2.1.1",
     "utctime_updated": "2022-03-01T21:27:34.000000Z",
     "package_name": "phantom_mcafeeepo",
     "product_vendor": "McAfee",
@@ -18,7 +18,7 @@
         "McAfee ePO v5.3.2"
     ],
     "python_version": "3",
-    "license": "Copyright (c) 2016-2022 Splunk Inc.",
+    "license": "Copyright (c) 2016-2024 Splunk Inc.",
     "fips_compliant": true,
     "configuration": {
         "username": {
@@ -789,56 +789,16 @@
     "pip_dependencies": {
         "wheel": [
             {
-                "module": "certifi",
-                "input_file": "wheels/py3/certifi-2022.6.15-py3-none-any.whl"
-            },
-            {
-                "module": "chardet",
-                "input_file": "wheels/shared/chardet-3.0.4-py2.py3-none-any.whl"
-            },
-            {
-                "module": "idna",
-                "input_file": "wheels/shared/idna-2.10-py2.py3-none-any.whl"
-            },
-            {
-                "module": "requests",
-                "input_file": "wheels/shared/requests-2.25.0-py2.py3-none-any.whl"
-            },
-            {
                 "module": "simplejson",
                 "input_file": "wheels/py36/simplejson-3.17.2-cp36-cp36m-manylinux2010_x86_64.manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
-            },
-            {
-                "module": "urllib3",
-                "input_file": "wheels/shared/urllib3-1.26.11-py2.py3-none-any.whl"
             }
         ]
     },
     "pip39_dependencies": {
         "wheel": [
             {
-                "module": "certifi",
-                "input_file": "wheels/py3/certifi-2022.6.15-py3-none-any.whl"
-            },
-            {
-                "module": "chardet",
-                "input_file": "wheels/shared/chardet-3.0.4-py2.py3-none-any.whl"
-            },
-            {
-                "module": "idna",
-                "input_file": "wheels/shared/idna-2.10-py2.py3-none-any.whl"
-            },
-            {
-                "module": "requests",
-                "input_file": "wheels/shared/requests-2.25.0-py2.py3-none-any.whl"
-            },
-            {
                 "module": "simplejson",
                 "input_file": "wheels/py39/simplejson-3.17.2-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
-            },
-            {
-                "module": "urllib3",
-                "input_file": "wheels/shared/urllib3-1.26.11-py2.py3-none-any.whl"
             }
         ]
     }

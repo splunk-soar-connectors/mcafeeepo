@@ -1,6 +1,6 @@
 # File: mfeepo_consts.py
 #
-# Copyright (c) 2016-2022 Splunk Inc.
+# Copyright (c) 2016-2024 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,4 +26,4 @@ KEY_TAGS = 'EPOLeafNode.Tags'
 KEY_ETAGS = 'EPOLeafNode.ExludedTags'
 IP_ADDR = 'EPOComputerProperties.IPAddress'
 NAME = 'EPOComputerProperties.ComputerName'
-ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
+ERROR_MESSAGE_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
