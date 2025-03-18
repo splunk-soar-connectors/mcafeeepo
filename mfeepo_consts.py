@@ -1,6 +1,6 @@
 # File: mfeepo_consts.py
 #
-# Copyright (c) 2016-2024 Splunk Inc.
+# Copyright (c) 2016-2025 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ EPO_JSON_QTAG = "quarantine_tag"
 EPO_JSON_TAG = "tag"
 EPO_JSON_WAKEUP_AGENT = "wakeup_agent"
 
-KEY_TAGS = 'EPOLeafNode.Tags'
-KEY_ETAGS = 'EPOLeafNode.ExludedTags'
-IP_ADDR = 'EPOComputerProperties.IPAddress'
-NAME = 'EPOComputerProperties.ComputerName'
+KEY_TAGS = "EPOLeafNode.Tags"
+KEY_ETAGS = "EPOLeafNode.ExludedTags"
+IP_ADDR = "EPOComputerProperties.IPAddress"
+NAME = "EPOComputerProperties.ComputerName"
 ERROR_MESSAGE_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
