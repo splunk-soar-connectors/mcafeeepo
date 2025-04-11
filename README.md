@@ -1,7 +1,7 @@
 # McAfee ePO
 
 Publisher: Splunk \
-Connector Version: 2.1.1 \
+Connector Version: 2.1.2 \
 Product Vendor: McAfee \
 Product Name: McAfee ePO \
 Minimum Product Version: 5.2.0
